@@ -1,0 +1,62 @@
+編譯方法
+在M11207432的資料夾底下輸入
+make
+
+
+執行方法
+在M11207432的資料夾底下輸入
+./exec/M11207432 [-h or -e] [your_input_file] [AND_num] [OR_num] [NOT_num]
+例如:
+./exec/M11207432 -e test.blif 1 0 1
+
+
+文件說明
+/glpk 		存放glpk.h的資料夾
+/src  		我的程式碼
+libglpk.a 	glpk的靜態函數庫
+makefile	makefile
+test.blif	pa2第7點要求的測試資料
+README		本文件
+
+
+執行./exec/M11207432 -e test.blif 1 0 1後，會在terminal產生以下輸出。
+前半部為heuristic的方法產生的結果，會把這個結果儲存成一份heuristic.txt文件
+後半部為glpk solver產生的結果，這個結果儲存成另一份exact.txt文件
+另外會自動產生兩份文件為model.lp和solution.txt，這是glpk自動產生的文件，無須理會。
+
+Heuristic Scheduling Result
+1: {a3} {} {}
+2: {a4} {} {}
+3: {a5} {} {}
+4: {a1} {} {}
+5: {a2} {} {}
+6: {a6} {} {i1}
+7: {a7} {} {i2}
+8: {a8} {} {i3}
+9: {} {} {i4}
+10: {} {} {i5}
+LATENCY: 10
+END
+glp_write_lp: writing problem data to `model.lp'...
+      0: obj =   0.000000000e+00  infeas =  3.100e+01 (14)
+*    48: obj =   1.100000000e+01  infeas =  1.110e-16 (0)
+*    68: obj =   7.750000000e+00  infeas =  4.441e-16 (0)
+OPTIMAL SOLUTION FOUND
+Integer optimization begins...
++    68: mip =     not found yet >=              -inf        (1; 0)
++   227: >>>>>   9.000000000e+00 >=   8.000000000e+00  11.1% (8; 0)
++   263: mip =   9.000000000e+00 >=     tree is empty   0.0% (0; 17)
+INTEGER OPTIMAL SOLUTION FOUND
+lpx_print_mip: writing MIP problem solution to `solution.txt'...
+ILP-based Sceduling Result
+1: {a1} {} {}
+2: {a2} {} {}
+3: {a3} {} {i3}
+4: {a4} {} {i4}
+5: {a5} {} {i1}
+6: {a6} {} {i5}
+7: {a7} {} {i2}
+8: {a8} {} {}
+LATENCY: 8
+END
+Program end 6 ms.

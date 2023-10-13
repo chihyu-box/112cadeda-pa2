@@ -1,0 +1,29 @@
+.inputs a b c d e f g h
+.outputs i1 i2 i3 i4 i5 a8
+.names a b a1
+11 1
+.names a a1 a2
+11 1
+.names a2 i1
+0 1
+.names a2 i2
+0 1
+.names a2 i3
+0 1
+.names a2 i4
+0 1
+.names a2 i5
+0 1
+.names b c a3
+11 1
+.names a3 d a4
+11 1
+.names a4 e a5
+11 1
+.names a5 f a6
+11 1
+.names a6 g a7
+11 1
+.names a7 h a8
+11 1
+.end
