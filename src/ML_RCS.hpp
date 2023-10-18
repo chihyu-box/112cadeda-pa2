@@ -136,7 +136,7 @@ private:
     void set_cost() {
         for(auto &node : graphInfo.node_map) {
             string node_name = node.first;
-            cost[node_name] = graphInfo.node_depth[node_name] + graphInfo.graph[node_name]->successors.size();
+            cost[node_name] = graphInfo.node_depth[node_name];
         }
     }
     void join(vector<shared_ptr<Node>>& root, const string &type = "normal") {
@@ -171,16 +171,46 @@ private:
             }
         }
     }
-    void sort_all() {
-        sort_candidate(candidate_AND);
-        sort_candidate(candidate_OR);
-        sort_candidate(candidate_NOT);
+    void adjust_cost(std::unordered_map<string, double>& adjusted_cost, const std::deque<std::string>& candidate, const string& type) {
+        for (const auto& id : candidate) {
+            int adjustment = 0;
+            if (type == "AND") adjustment = double(graphInfo.graph[id]->and_num) / AND_num;
+            else if (type == "OR") adjustment = double(graphInfo.graph[id]->or_num) / OR_num;
+            else if (type == "NOT") adjustment = double(graphInfo.graph[id]->not_num) / NOT_num;
+            adjusted_cost[id] = cost[id] + adjustment;
+        }
     }
-    void sort_candidate(std::deque<std::string>& candidate) {
-        sort(candidate.begin(), candidate.end(), [this](const string& a, const string& b) {
-            return this->cost.at(a) > this->cost.at(b);
+
+    void sort_all() {
+        std::unordered_map<string, double> adjusted_cost = cost;
+
+        if (candidate_AND.empty()) {
+            adjust_cost(adjusted_cost, candidate_OR, "AND");
+            adjust_cost(adjusted_cost, candidate_NOT, "AND");
+        }
+
+        if (candidate_OR.empty()) {
+            adjust_cost(adjusted_cost, candidate_AND, "OR");
+            adjust_cost(adjusted_cost, candidate_NOT, "OR");
+        }
+
+        if (candidate_NOT.empty()) {
+            adjust_cost(adjusted_cost, candidate_AND, "NOT");
+            adjust_cost(adjusted_cost, candidate_OR, "NOT");
+        }
+
+        sort_candidate(candidate_AND, adjusted_cost);
+        sort_candidate(candidate_OR, adjusted_cost);
+        sort_candidate(candidate_NOT, adjusted_cost);
+    }
+
+
+    void sort_candidate(deque<string>& candidate, const unordered_map<string, double>& adjusted_cost) {
+        sort(candidate.begin(), candidate.end(), [&adjusted_cost](const string& a, const string& b) {
+            return adjusted_cost.at(a) > adjusted_cost.at(b);
         });
     }
+
     void print_out() {
         cout << "Heuristic Scheduling Result" << endl;
         for(int i=1; i<=latency; ++i) {

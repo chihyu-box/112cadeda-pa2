@@ -33,13 +33,14 @@ int main(int argc, char** argv)
 	graphInfo.computeNodeDepth();
 	graphInfo.computeASAP();
 	graphInfo.completeNodeLabel();
-
+	graphInfo.computeTypeNum();
 // graphInfo.computeASAP();
 // graphInfo.computeALAP(latency+1);
 // graphInfo.printALAPLevel(latency+1);
 // graphInfo.printGraph();
 // graphInfo.printNodeMap();
 // graphInfo.printNodeLabel();
+// graphInfo.printTypeNum();
 
 	// INTIAIL METHOD
 	Method method(graphInfo, stoi(argv[3]), stoi(argv[4]), stoi(argv[5]));
@@ -48,6 +49,12 @@ int main(int argc, char** argv)
 		latency = method.run_MLRCS();
 	}
 	else if(methodArg == "-e") {
+		method.run_ASAP();
+		latency = method.run_MLRCS();
+		method.run_ALAP(latency+1);
+		method.run_GUROBI(latency+1);
+	}
+	else if(methodArg == "-glpk") {
 		method.run_ASAP();
 		latency = method.run_MLRCS();
 		method.run_ALAP(latency+1);

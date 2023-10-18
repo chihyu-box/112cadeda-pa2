@@ -13,6 +13,14 @@
 #include "logic_gate.hpp"
 using namespace std;
 
+tuple<int, int, int> operator+(const tuple<int, int, int>& lhs, const tuple<int, int, int>& rhs) {
+    return make_tuple(
+        get<0>(lhs) + get<0>(rhs),
+        get<1>(lhs) + get<1>(rhs),
+        get<2>(lhs) + get<2>(rhs)
+    );
+}
+
 struct GraphInfo {
 	unordered_map<string, shared_ptr<NodeAdj>> graph;
 	unordered_map<string, shared_ptr<Node>> node_map;
@@ -22,6 +30,8 @@ struct GraphInfo {
 	unordered_map<string, int> asap_level;
 	unordered_map<string, int> alap_level;
 	int node_count;
+
+	std::unordered_set<std::shared_ptr<Node>> visited;
 
 	GraphInfo() : node_count(0) {
 		graph["head"] = make_shared<NodeAdj>();
@@ -112,6 +122,21 @@ struct GraphInfo {
 	void computeALAP(int latency) {
     	BFS(node_map["tail"], false, alap_level, latency);
     	removeLevels(alap_level);	
+	}
+
+	void computeTypeNum() {
+		visited.clear();
+		countTypeNum(node_map["head"]);
+	}
+
+	void printTypeNum() {
+		cout << "Type Num:" << endl;
+	    for (const auto& pair : graph) {
+	        cout << pair.first << " -> AND -> " << pair.second->and_num << endl;
+	        cout << pair.first << " -> OR -> " << pair.second->or_num << endl;
+	        cout << pair.first << " -> NOT -> " << pair.second->not_num << endl;
+	    }
+	    cout << endl;
 	}
 
 	void printGraph() {
@@ -221,7 +246,6 @@ private:
 	        }
 	    }
 	}
-
 	void removeLevels(unordered_map<string, int>& levelMap) {
 	    for (auto it = levelMap.begin(); it != levelMap.end(); ) {
 	        auto nodeType = node_map[it->first]->get_type();
@@ -242,5 +266,38 @@ private:
         for (auto& predecessor : graph[node->get_id()]->predecessors) {
             dfsComputeDepth(predecessor, depth + 1);
         }
+    }
+
+	tuple<int, int, int> countTypeNum(shared_ptr<Node>& node) {
+        if (visited.find(node) != visited.end()) {
+            return {0, 0, 0};
+        }
+        visited.insert(node);
+
+        auto leaves = graph[node->get_id()]->successors;
+        tuple<int, int, int> t;
+        if (node->get_type() == logic_gate::TAIL) {
+            return {0, 0, 0};
+        }
+        for (auto& leaf : leaves) {
+            t = t + countTypeNum(leaf);
+        }
+        switch (node->get_type()) {
+        case logic_gate::AND:
+            get<0>(t) += 1;
+            break;
+        case logic_gate::OR:
+            get<1>(t) += 1;
+            break;
+        case logic_gate::NOT:
+            get<2>(t) += 1;
+            break;
+        default:
+            break;
+        }
+        graph[node->get_id()]->and_num = get<0>(t);
+        graph[node->get_id()]->or_num = get<1>(t);
+        graph[node->get_id()]->not_num = get<2>(t);
+        return t;
     }
 };

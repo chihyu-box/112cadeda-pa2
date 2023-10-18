@@ -3,7 +3,7 @@
 #include "GraphInfo.hpp"
 #include "ML_RCS.hpp"
 #include "ILP.hpp"
-
+#include "GUROBI.hpp"
 using namespace std;
 
 class Method {
@@ -38,6 +38,23 @@ public:
     	ilp.solve();
     	ilp.write_out();
     	return ilp.get_latency();
+    }
+
+    int run_GUROBI(int latency) {
+        try {
+            GUROBI gurobi(graphInfo, latency, AND_num, OR_num, NOT_num);
+            gurobi.solve();
+            gurobi.write_out();
+            return gurobi.get_latency();       
+        } catch (const GRBException& e) {
+            cerr << "Error code: " << e.getErrorCode() << endl;
+            cerr << e.getMessage() << endl;
+        } catch (const std::exception& e) {
+            cerr << "Standard exception: " << e.what() << endl;
+        } catch (...) {
+            cerr << "Unknown exception caught!" << endl;
+        }
+        return -1;
     }
 };
 

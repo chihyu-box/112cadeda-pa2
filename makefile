@@ -1,8 +1,8 @@
 # Compiler, Flags, and Libraries
 CXX = g++
-CXXFLAGS = -Wall -std=c++17 -I./glpk
+CXXFLAGS = -Wall -std=c++17 -I./glpk -I./gurobi
 #LDFLAGS = -L/usr/local/lib -lglpk -Wl,-rpath=/usr/local/lib
-LDFLAGS = ./libglpk.a
+LDFLAGS = ./libglpk.a ./libgurobi_c++.a ./libgurobi100.so
 
 # Directories
 SRCDIR = src

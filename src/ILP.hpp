@@ -107,7 +107,7 @@ private:
 					glp_set_col_bnds(ilp, num, GLP_FX, 0.0, 0.0);
 				}
 				else {
-			    	glp_set_col_bnds(ilp, num, GLP_LO, 0.0, 0.0);  // x >= 0
+			    	glp_set_col_bnds(ilp, num, GLP_LO, 0.0, 0.0);  // 1 >= x >= 0
 				}
 			    glp_set_col_kind(ilp, num, GLP_IV);            // x is integer
 			    if(graphInfo.node_label[i] != "tail") {
